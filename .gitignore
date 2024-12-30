@@ -1,0 +1,44 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+virtualenv/
+venv/
+ENV/
+env/
+
+# Python distribution and packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Local development environment files
+.env
+*.env
+*.venv
+
+# IDE and editor settings (e.g., VS Code, PyCharm)
+.vscode/
+.idea/
+
+# AWS Lambda Deployment Package (app.zip) -- if it's automatically generated
+app.zip
+
+# Test files
+test.json
+todo.txt
+
+# PyCharm and other IDE files
+*.iml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

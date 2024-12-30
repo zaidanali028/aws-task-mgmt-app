@@ -27,8 +27,7 @@ async def admin_login(credentials: AdminUserLogin):
   
     try:
         # print(COGNITO_APP_CLIENT_ID, COGNITO_APP_CLIENT_SECRET)
-        secret_hash=utils.generate_secret_hash(my_env_vars.get("COGNITO_APP_CLIENT_ID"), my_env_vars.get("COGNITO_APP_CLIENT_SECRET"), credentials.email)
-        secret_hash_2=utils.generate_secret_hash(my_env_vars.get("COGNITO_APP_CLIENT_ID"), '11s42a3hm384b96efdgdmiq7e7v6inh819nk691e89k0ilsa4bac', credentials.email)
+        secret_hash=utils.generate_secret_hash(my_env_vars.get("COGNITO_APP_CLIENT_ID"), my_env_vars.get("COGNITO_APP_CLIENT_SECRET2"), credentials.email)
         # Try to authenticate the user with the provided email and password
         response = cognito_client.initiate_auth(
             ClientId=my_env_vars.get("COGNITO_APP_CLIENT_ID"),
@@ -36,7 +35,7 @@ async def admin_login(credentials: AdminUserLogin):
             AuthParameters={
                 'USERNAME': credentials.email,
                 'PASSWORD': credentials.password,
-                'SECRET_HASH': secret_hash_2  # Include the SECRET_HASH here
+                'SECRET_HASH': secret_hash  # Include the SECRET_HASH here
             }
             
         )

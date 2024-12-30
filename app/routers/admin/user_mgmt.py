@@ -56,8 +56,11 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
             Username=username,
             GroupName="TeamMembers",
         )
+        
+        # emit event using event bridge
+        event_response=utils.publish_user_created_event(team_member.email,team_member.given_name,team_member.family_name)
 
-        return {"message": "Team member created successfully!","response":response}
+        return {"message": "Team member created successfully!","response":response,"event_response":event_response}
     
     except cognito_client.exceptions.UsernameExistsException:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists.")

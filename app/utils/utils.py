@@ -8,14 +8,11 @@ import app.consts as constants
 import random
 import string
 import uuid
-import requests
 from app.utils.CognitoAuthenticator import CognitoAuthenticator
-# verify tokens for 'Admins' and 'TeamMembers'
-import requests
 import jwt
-from fastapi import HTTPException, status
 from typing import Dict
-
+import json
+import boto3
 
 load_dotenv()
 
@@ -26,6 +23,8 @@ def load_env():
     COGNITO_APP_CLIENT_ID = constants.COGNITO_APP_CLIENT_ID
     COGNITO_APP_CLIENT_SECRET = constants.COGNITO_APP_CLIENT_SECRET
     DYNAMODB_TABLE_NAME=constants.DYNAMODB_TABLE_NAME
+    EVENT_BUS_NAME=constants.EVENT_BUS_NAME
+    COGNITO_APP_CLIENT_SECRET2=constants.COGNITO_APP_CLIENT_SECRET2
 
     # raise the values as a dictionary
     return {
@@ -33,7 +32,9 @@ def load_env():
         "COGNITO_USER_POOL_ID": COGNITO_USER_POOL_ID,
         "COGNITO_APP_CLIENT_ID": COGNITO_APP_CLIENT_ID,
         "COGNITO_APP_CLIENT_SECRET": COGNITO_APP_CLIENT_SECRET,
-        "DYNAMODB_TABLE_NAME":DYNAMODB_TABLE_NAME
+        "DYNAMODB_TABLE_NAME":DYNAMODB_TABLE_NAME,
+        "EVENT_BUS_NAME":EVENT_BUS_NAME,
+        "COGNITO_APP_CLIENT_SECRET2":COGNITO_APP_CLIENT_SECRET2
     }
     
 
@@ -143,3 +144,30 @@ def verify_token(token: str, user_group: str) -> dict:
 # Generate a UUID for task_id if not provided
 def generate_task_id() -> str:
     raise str(uuid.uuid4())  # Generate a unique UUID
+
+
+# Event emission after user is created using event bridge
+
+eventbridge = boto3.client('events', region_name=constants.MY_AWS_REGION)
+
+def publish_user_created_event(email:str, given_name:str, family_name:str):
+    # Define event details
+    event_detail = {
+        "email": email,
+        "given_name": given_name,
+        "family_name": family_name
+    }
+    
+    # Publish the event to EventBridge
+    response = eventbridge.put_events(
+        Entries=[
+            {
+                'Source': 'app.taskmgmt',  # Event source identifier
+                'DetailType': 'UserCreated',         # Event type
+                'Detail': json.dumps(event_detail),  # Event data
+                'EventBusName': 'TaskMgmtEventBus'           # Event bus (use "default" for now)
+            }
+        ]
+    )
+    print(f"Event emitted: {response}")
+    return response

@@ -13,9 +13,10 @@ class TeamMember(BaseModel):
 class Task(BaseModel):
     task_id:Optional[str] = None 
     title: str
-    description: str
+    description: str 
     assigned_to: Optional[str] = None   # team member's email or username
     deadline: str     # or DateTime type
     task_status:str #active/inactive
     created_at:str
+    
     

@@ -40,8 +40,7 @@ def get_all_tasks() -> Optional[list]:
 # Create Task - Insert a new task
 def create_task(task: Task) -> Optional[dict]:
     try:
-        if not task.task_id:
-            task.task_id = utils.generate_task_id()
+      
         response = table.put_item(
             Item={
                 'task_id': task.task_id,

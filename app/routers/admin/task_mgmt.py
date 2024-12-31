@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 import uuid
 from typing import List
 from app.db import task as task_model
+import time
 my_env_vars=utils.load_env()
 
 # Initialize FastAPI OAuth2 password bearer for security (e.g., authentication)
@@ -30,6 +31,7 @@ async def create_task(task: Task, token: str = Depends(oauth2_scheme)):
         # Generate task_id if not provided
         if not task.task_id:
             task.task_id = utils.generate_task_id()
+        task.created_at = time.strftime("%Y-%m-%d %H:%M:%S")
         
         # Insert task into DynamoDB
         task_response=task_model.create_task(task)

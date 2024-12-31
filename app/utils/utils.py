@@ -143,7 +143,7 @@ def verify_token(token: str, user_group: str) -> dict:
 
 # Generate a UUID for task_id if not provided
 def generate_task_id() -> str:
-    raise str(uuid.uuid4())  # Generate a unique UUID
+    return str(uuid.uuid4())  # Generate a unique UUID
 
 
 # Event emission after user is created using event bridge

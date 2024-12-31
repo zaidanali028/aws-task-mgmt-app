@@ -17,6 +17,6 @@ class Task(BaseModel):
     assigned_to: Optional[str] = None   # team member's email or username
     deadline: str     # or DateTime type
     task_status:str #active/inactive
-    created_at:str
+    created_at:Optional[str] = None 
     
     

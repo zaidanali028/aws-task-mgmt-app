@@ -22,59 +22,66 @@ async def get_admin_info():
 # Pydantic model for login data
 
 
-@router.post("/login")
+@router.post("/login", summary="Admin Login")
 async def admin_login(credentials: AdminUserLogin):
-  
+    """
+    Authenticate an admin user and return an access token with user details.
+    """
     try:
-        # print(COGNITO_APP_CLIENT_ID, COGNITO_APP_CLIENT_SECRET)
-        secret_hash=utils.generate_secret_hash(my_env_vars.get("COGNITO_APP_CLIENT_ID"), my_env_vars.get("COGNITO_APP_CLIENT_SECRET2"), credentials.email)
-        # Try to authenticate the user with the provided email and password
+        # Generate the secret hash
+        secret_hash = utils.generate_secret_hash(
+            my_env_vars.get("COGNITO_APP_CLIENT_ID"),
+            my_env_vars.get("COGNITO_APP_CLIENT_SECRET2"),
+            credentials.email
+        )
+
+        # Authenticate the user with Cognito
         response = cognito_client.initiate_auth(
             ClientId=my_env_vars.get("COGNITO_APP_CLIENT_ID"),
             AuthFlow='USER_PASSWORD_AUTH',
             AuthParameters={
                 'USERNAME': credentials.email,
                 'PASSWORD': credentials.password,
-                'SECRET_HASH': secret_hash  # Include the SECRET_HASH here
+                'SECRET_HASH': secret_hash
             }
-            
         )
-        
-        # return response
 
-        # Retrieve the tokens from the authentication result
+        # Retrieve tokens
         id_token = response['AuthenticationResult']['IdToken']
         access_token = response['AuthenticationResult']['AccessToken']
         refresh_token = response['AuthenticationResult']['RefreshToken']
 
-        
-
-         # Decode the access token to get user information (username or 'sub')
+        # Decode the access token to get user info
         decoded_access_token = utils.verify_token(access_token, "Admins")
 
-         # Check if 'Admin' group exists in the decoded token
-        user_groups = decoded_access_token.get('decoded_token').get('cognito:groups', [])
-        # print(decoded_access_token)
-       
-        
-         
+        # Check user groups
+        user_groups = decoded_access_token.get('decoded_token', {}).get('cognito:groups', [])
         if 'Admins' not in user_groups:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not an Admin")
 
-        else:
-            print("User is an Admin")
-        # Return the tokens if the user is an Admin
-        return {
-            # "id_token": id_token,
-            "access_token": access_token,
-            # "refresh_token": refresh_token
-        }
-       
+        # Fetch user attributes from Cognito
+        user_details = cognito_client.get_user(AccessToken=access_token)
+        attributes = {attr['Name']: attr['Value'] for attr in user_details['UserAttributes']}
+        username = attributes.get('sub', 'N/A')
+        email = attributes.get('email', 'N/A')
+        given_name = attributes.get('given_name', 'N/A')
+        family_name = attributes.get('family_name', 'N/A')
 
+        # Return the response
+        return {
+            "access_token": access_token,
+            "user": {
+                "username": username,
+                "email": email,
+                "given_name": given_name,
+                "family_name": family_name,
+                "user_group": user_groups
+            }
+        }
 
     except cognito_client.exceptions.NotAuthorizedException as e:
-        print(e)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
-   
-        
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
+    except cognito_client.exceptions.UserNotFoundException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist.")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

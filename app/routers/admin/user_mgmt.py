@@ -67,3 +67,72 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
     
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+    
+    
+@router.get("/users", summary="Get all users excluding the logged-in user/admin")
+async def get_all_users(token: str = Depends(oauth2_scheme)):
+    """
+    Fetches all users from the 'TeamMembers' group in Cognito, excluding the logged-in user.
+    Returns their names and usernames.
+    """
+    # Verify the token and extract user details
+    decoded_token = utils.verify_token(token, 'Admins')
+    logged_in_user_username = decoded_token.get('decoded_token', {}).get("username")
+    
+    if not logged_in_user_username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unable to retrieve the logged-in user's username."
+        )
+
+    cognito_client = boto3.client('cognito-idp', region_name=my_env_vars.get("MY_AWS_REGION"))
+
+    try:
+        user_pool_id = my_env_vars.get("COGNITO_USER_POOL_ID")
+        users = []
+        pagination_token = None
+
+        # Fetch users in the "TeamMembers" group
+        while True:
+            if pagination_token:
+                response = cognito_client.list_users_in_group(
+                    UserPoolId=user_pool_id,
+                    GroupName="TeamMembers",
+                    NextToken=pagination_token
+                )
+            else:
+                response = cognito_client.list_users_in_group(
+                    UserPoolId=user_pool_id,
+                    GroupName="TeamMembers"
+                )
+            
+            for user in response.get('Users', []):
+                username = user.get("Username")
+                if username != logged_in_user_username:
+                    # Extract desired attributes
+                    given_name = next(
+                        (attr['Value'] for attr in user.get('Attributes', []) if attr['Name'] == 'given_name'), "N/A"
+                    )
+                    family_name = next(
+                        (attr['Value'] for attr in user.get('Attributes', []) if attr['Name'] == 'family_name'), "N/A"
+                    )
+                    users.append({"username": username, "name": f"{given_name} {family_name}"})
+            
+            # Check if more pages are available
+            pagination_token = response.get('NextToken')
+            if not pagination_token:
+                break
+        
+        return {"users": users}
+
+    except cognito_client.exceptions.ResourceNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The TeamMembers group or user pool was not found."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve users: {str(e)}"
+        )

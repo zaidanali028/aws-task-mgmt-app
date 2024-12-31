@@ -28,7 +28,8 @@ build/
 
 # AWS Lambda Deployment Package (app.zip) -- if it's automatically generated
 app.zip
-
+lambda_layer
+lambda_layer/
 # Test files
 test.json
 todo.txt

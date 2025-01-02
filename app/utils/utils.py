@@ -150,12 +150,14 @@ def generate_task_id() -> str:
 
 eventbridge = boto3.client('events', region_name=constants.MY_AWS_REGION)
 
-def publish_user_created_event(email:str, given_name:str, family_name:str):
+def publish_user_created_event(email:str, given_name:str, family_name:str,user_password:str):
     # Define event details
     event_detail = {
         "email": email,
         "given_name": given_name,
-        "family_name": family_name
+        "family_name": family_name,
+        "user_password": user_password
+        
     }
     
     # Publish the event to EventBridge

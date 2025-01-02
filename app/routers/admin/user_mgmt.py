@@ -21,7 +21,7 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
     
 
     try:
-        
+        user_password=utils.generate_random_password()
         # Create user in Cognito
         response = cognito_client.admin_create_user(
             UserPoolId=my_env_vars.get("COGNITO_USER_POOL_ID"),
@@ -31,13 +31,22 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
                 {'Name': 'given_name', 'Value': team_member.given_name},
                 {'Name': 'family_name', 'Value': team_member.family_name},
             ],
-            # MessageAction='SUPPRESS',  # Disable sending welcome email
-            TemporaryPassword=utils.generate_random_password()
+            MessageAction='SUPPRESS',  # Disable sending welcome email
+            # TemporaryPassword=utils.generate_random_password()
 
         )
         
-        # Extract the created user's username
+         # Extract the created user's username
         created_username = response['User']['Username']
+        # set user password
+        cognito_client.admin_set_user_password(
+            UserPoolId=my_env_vars.get("COGNITO_USER_POOL_ID"),
+            Username=created_username,
+            Password=user_password,
+            Permanent=True
+        )
+        
+       
 
         # Confirm the user to avoid forcing a password reset
         cognito_client.admin_update_user_attributes(
@@ -58,7 +67,7 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
         )
         
         # emit event using event bridge
-        event_response=utils.publish_user_created_event(team_member.email,team_member.given_name,team_member.family_name)
+        event_response=utils.publish_user_created_event(team_member.email,team_member.given_name,team_member.family_name,user_password)
 
         return {"message": "Team member created successfully!","response":response,"event_response":event_response}
     

@@ -78,7 +78,58 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
     
-    
+   
+# get a specifyc user by username
+@router.get("/users/{user_name}", summary="Get user by username")
+async def get_user_by_username(user_name: str, token: str = Depends(oauth2_scheme)):
+    """
+    Fetches a user's details from the 'TeamMembers' group in Cognito by username.
+    Returns their name and username.
+    """
+    # Verify the token and extract user details
+    decoded_token = utils.verify_token(token, 'Admins')
+
+    if not decoded_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token."
+        )
+
+    cognito_client = boto3.client('cognito-idp', region_name=my_env_vars.get("MY_AWS_REGION"))
+
+    try:
+        user_pool_id = my_env_vars.get("COGNITO_USER_POOL_ID")
+
+        # Fetch user details by username
+        response = cognito_client.admin_get_user(
+            UserPoolId=user_pool_id,
+            Username=user_name
+        )
+
+        # Extract desired attributes
+        given_name = next(
+            (attr['Value'] for attr in response.get('UserAttributes', []) if attr['Name'] == 'given_name'), "N/A"
+        )
+        family_name = next(
+            (attr['Value'] for attr in response.get('UserAttributes', []) if attr['Name'] == 'family_name'), "N/A"
+        )
+
+        return {"username": user_name, "name": f"{given_name} {family_name}"}
+
+    except cognito_client.exceptions.UserNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with username '{user_name}' was not found."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve user: {str(e)}"
+        )
+
+
+
+# get users 
 @router.get("/users", summary="Get all users excluding the logged-in user/admin")
 async def get_all_users(token: str = Depends(oauth2_scheme)):
     """

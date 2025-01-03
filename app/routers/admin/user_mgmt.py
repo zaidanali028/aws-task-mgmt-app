@@ -4,6 +4,7 @@ import app.utils.utils as utils
 from app.models import TeamMember
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from app.db import user as user_model
 
 # Initialize OAuth2PasswordBearer instance
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") 
@@ -171,13 +172,18 @@ async def get_all_users(token: str = Depends(oauth2_scheme)):
                 username = user.get("Username")
                 if username != logged_in_user_username:
                     # Extract desired attributes
+                   
                     given_name = next(
                         (attr['Value'] for attr in user.get('Attributes', []) if attr['Name'] == 'given_name'), "N/A"
                     )
                     family_name = next(
                         (attr['Value'] for attr in user.get('Attributes', []) if attr['Name'] == 'family_name'), "N/A"
                     )
-                    users.append({"username": username, "name": f"{given_name} {family_name}"})
+                    email = next(
+                        (attr['Value'] for attr in user.get('Attributes', []) if attr['Name'] == 'email'), "N/A"
+                    )
+                    users.append({"family_name": family_name, "given_name": given_name, "email": email,"user_id": username})
+                    
             
             # Check if more pages are available
             pagination_token = response.get('NextToken')
@@ -195,4 +201,42 @@ async def get_all_users(token: str = Depends(oauth2_scheme)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve users: {str(e)}"
+        )
+    
+@router.put("/users/{user_id}", summary="Update user attributes in Cognito")
+# USER ID IS the username in cognito
+async def update_user(user_id: str, updated_user: dict, token: str = Depends(oauth2_scheme)):
+    """
+    Updates user attributes in AWS Cognito.
+    Args:
+        user_id: The ID of the user to update.
+        updated_user: A dictionary containing the attributes to be updated.
+        token: The authorization token of the logged-in user.
+    Returns:
+        A success message with the updated user details.
+    """
+    try:
+        # Verify the token for Admin privileges
+        utils.verify_token(token, "Admins")
+        
+        # Call the user update logic
+        updated_user_response = user_model.update_user(user_id, updated_user)
+        
+        if updated_user_response:
+            return {
+                "user_id": user_id,
+                "message": "User updated successfully.",
+                "user_data": updated_user_response
+            }
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"User with ID {user_id} not found or could not be updated."
+            )
+    except HTTPException as http_err:
+        raise http_err
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error updating user: {str(e)}"
         )

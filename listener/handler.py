@@ -2,24 +2,25 @@ import json
 import boto3
 
 # Initialize SES client
-ses_client = boto3.client("ses", region_name="eu-west-1")  # Replace with your AWS region
+ses_client = boto3.client("ses", region_name="eu-west-1")  
 
 def handler(event, context):
     try:
-        print("Received event:", json.dumps(event))  # Log the event for debugging
+        print("Received event:", json.dumps(event))  
 
-        # Extract recipient email and name from the event
+        # Extracting recipient email ,password and name from the event
         detail = event.get("detail", {})
-        recipient_email = detail.get("email", "recipient@example.com")  # Replace with a verified email for testing
+        recipient_email = detail.get("email", "recipient@example.com")  
         given_name = detail.get("given_name", "User")
+        user_password = detail.get("user_password", "")
 
         # Email content
         subject = "Welcome to Task Management!"
-        body_text = f"Hi {given_name},\n\nWelcome to our Task Management system! We're excited to have you onboard.\n\n#awsEventBridge"
+        body_text = f"Hi {given_name},\n\nWelcome to our Task Management system! We're excited to have you onboard.\nYou can find your login credentials below\n\nEmail:{recipient_email}\nPassword:{user_password}\n\n#awsEventBridge"
 
         # Sending email using SES
         response = ses_client.send_email(
-            Source="zaidanali028@gmail.com",  # Replace with your verified sender email
+            Source="zaidanali028@gmail.com",  #verified email on ses
             Destination={"ToAddresses": [recipient_email]},
             Message={
                 "Subject": {"Data": subject},

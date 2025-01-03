@@ -89,36 +89,45 @@ def get_task(task_id: str,assigned_to:str) -> Optional[Task]:
         return None
 
 # Update Task - Update an existing task's details
-def update_task(task_id: str, assigned_to: str, updated_task: Task) -> Optional[dict]:
+def update_task(task_id: str, current_assigned_to: str, updated_task: Task) -> Optional[dict]:
     try:
-        # Update the item in DynamoDB
-        response = table.update_item(
+        # Get the current item
+        existing_task = table.get_item(
             Key={
                 'task_id': task_id,
-                'assigned_to': assigned_to
-            },
-            UpdateExpression=(
-                "SET title = :t, "
-                "description = :d, "
-                "deadline = :e, "
-                "task_status = :s, "
-                "created_at = :c"
-            ),
-            ExpressionAttributeValues={
-                ':t': updated_task.title,
-                ':d': updated_task.description,
-                ':e': updated_task.deadline,
-                ':s': updated_task.task_status,
-                ':c': updated_task.created_at
-            },
-            ReturnValues="ALL_NEW"
-            # helps in returning the new state of the updated record
-        )
-        return response
-    except ClientError as e:
-        print(f"Error updating task->: {e}")
-        return None
+                'assigned_to': current_assigned_to
+            }
+        ).get('Item', None)
+        
+        if not existing_task:
+            print("Task not found!")
+            return None
 
+        # Create a new item with updated 'assigned_to'
+        new_task = existing_task.copy()
+        new_task.update({
+            'assigned_to': updated_task.assigned_to,
+            'title': updated_task.title,
+            'description': updated_task.description,
+            'deadline': updated_task.deadline,
+            'task_status': updated_task.task_status,
+            'created_at': updated_task.created_at
+        })
+
+        table.put_item(Item=new_task)
+
+        # Delete the old item
+        table.delete_item(
+            Key={
+                'task_id': task_id,
+                'assigned_to': current_assigned_to
+            }
+        )
+
+        return new_task  # Return the new task details
+    except ClientError as e:
+        print(f"Error reassigning task: {e}")
+        return None
 # Delete Task - Remove a task from the database
 def delete_task(task_id: str,assigned_to:str) -> Optional[dict]:
     try:

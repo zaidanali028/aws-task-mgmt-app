@@ -35,13 +35,29 @@ async def list_my_tasks(assigned_to:str,token: str = Depends(oauth2_scheme)):
 
 
 # CRUD Operation: Update an existing task
-@router.put("/tasks/{task_id}/{assigned_to}")
-async def update_task(task_id: str, assigned_to:str,updated_task: Task, token: str = Depends(oauth2_scheme)):
-    # try:
-    utils.verify_token(token,"TeamMembers")
-    # Update task in DynamoDB
-    task_response=task_model.update_task(task_id,assigned_to, updated_task)
-    return {"task_id": task_id, "message": "Task updated successfully.","task_data":task_response}
-        
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=f"Error updating task: {str(e)}")
+@router.put("/tasks/{task_id}")
+async def update_task(task_id: str, updated_task: Task, token: str = Depends(oauth2_scheme)):
+    try:
+        # Verify token and extract user info
+        user_id = utils.verify_token(token, "TeamMembers").get('decoded_token').get('sub')
+
+        # Retrieve the existing task from DynamoDB to check the 'assigned_to' field
+        existing_task = task_model.get_task_by_id(task_id)  # Implement this function to get the task by ID
+        if not existing_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        # Check if the current user is assigned to the task
+        if existing_task.get('assigned_to') != user_id:  # Assuming 'username' is part of the token
+            raise HTTPException(status_code=403, detail="You are not authorized to update this task")
+
+        # Proceed with the task update
+        task_response = task_model.update_task(task_id, updated_task)
+
+        return {
+            "task_id": task_id,
+            "message": "Task updated successfully.",
+            "task_data": task_response
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating task: {str(e)}")

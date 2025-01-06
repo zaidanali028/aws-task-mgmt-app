@@ -87,42 +87,45 @@ def get_task(task_id: str,assigned_to:str) -> Optional[Task]:
     except ClientError as e:
         print(f"Error getting task: {e}")
         return None
+    
 
-def update_task(task_id: str, current_assigned_to: str, updated_task: Task) -> Optional[dict]:
+def get_task_by_id(task_id: str) -> Optional[dict]:
     try:
-          # Create the new item
-        table.put_item(
-            Item={
-                'task_id': task_id,
-                'assigned_to': updated_task.assigned_to,
-                'title': updated_task.title,
-                'description': updated_task.description,
-                'deadline': updated_task.deadline,
-                'task_status': updated_task.task_status,
-                'created_at': updated_task.created_at
-            }
+        # Retrieve the task from DynamoDB
+        response = table.get_item(Key={'task_id': task_id})
+        return response.get('Item', None)
+    except ClientError as e:
+        print(f"Error retrieving task: {e.response['Error']['Message']}")
+        return None
+
+
+def update_task(task_id: str, updated_task: Task) -> Optional[dict]:
+    try:
+        # Update the existing task item with the new values for specific attributes
+        response = table.update_item(
+            Key={
+                'task_id': task_id  # Assuming 'task_id' is the primary key
+            },
+            UpdateExpression="SET assigned_to = :assigned_to, title = :title, description = :description, deadline = :deadline, task_status = :task_status, created_at = :created_at",
+            ExpressionAttributeValues={
+                ':assigned_to': updated_task.assigned_to,
+                ':title': updated_task.title,
+                ':description': updated_task.description,
+                ':deadline': updated_task.deadline,
+                ':task_status': updated_task.task_status,
+                ':created_at': updated_task.created_at
+            },
+            ReturnValues="ALL_NEW"  # Return the updated attributes
         )
 
-        # Delete the old item
-        table.delete_item(
-            Key={
-                'task_id': task_id,
-                'assigned_to': current_assigned_to
-            }
-        )
-        
-        return {
-            'task_id': task_id,
-            'assigned_to': updated_task.assigned_to,
-            'title': updated_task.title,
-            'description': updated_task.description,
-            'deadline': updated_task.deadline,
-            'task_status': updated_task.task_status,
-            'created_at': updated_task.created_at
-        }
+        # The updated task is contained in the 'Attributes' key in the response
+        updated_item = response.get('Attributes', {})
+
+        return updated_item
 
     except ClientError as e:
-        print(f"Transaction failed: {e.response['Error']['Message']}")
+        # Handle any errors that occurred during the update
+        print(f"Error updating task: {e.response['Error']['Message']}")
         return None
 
 

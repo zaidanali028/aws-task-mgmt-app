@@ -22,15 +22,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # Step 3: Navigate to the Lambda folder
-    - name: Navigate to Lambda folder
-      working-directory: ./app
-
-    # Step 4: Zip the Lambda function code
+    # Step 3: Zip the Lambda function code in the 'app' folder
     - name: Zip Lambda function
-      run: zip -r ../function.zip . # Zip contents and save it one level above
+      run: |
+        cd app
+        zip -r ../function.zip .
 
-    # Step 5: Deploy to AWS Lambda
+    # Step 4: Deploy to AWS Lambda
     - name: Deploy to AWS Lambda
       run: |
         aws lambda update-function-code \

@@ -32,3 +32,16 @@ async def list_my_tasks(assigned_to:str,token: str = Depends(oauth2_scheme)):
         return task_response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error listing tasks: {str(e)}")
+
+
+# CRUD Operation: Update an existing task
+@router.put("/tasks/{task_id}/{assigned_to}")
+async def update_task(task_id: str, assigned_to:str,updated_task: Task, token: str = Depends(oauth2_scheme)):
+    # try:
+    utils.verify_token(token,"TeamMembers")
+    # Update task in DynamoDB
+    task_response=task_model.update_task(task_id,assigned_to, updated_task)
+    return {"task_id": task_id, "message": "Task updated successfully.","task_data":task_response}
+        
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Error updating task: {str(e)}")

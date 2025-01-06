@@ -88,33 +88,20 @@ def get_task(task_id: str,assigned_to:str) -> Optional[Task]:
         print(f"Error getting task: {e}")
         return None
 
-# Update Task - Update an existing task's details
 def update_task(task_id: str, current_assigned_to: str, updated_task: Task) -> Optional[dict]:
     try:
-        # Get the current item
-        existing_task = table.get_item(
-            Key={
+          # Create the new item
+        table.put_item(
+            Item={
                 'task_id': task_id,
-                'assigned_to': current_assigned_to
+                'assigned_to': updated_task.assigned_to,
+                'title': updated_task.title,
+                'description': updated_task.description,
+                'deadline': updated_task.deadline,
+                'task_status': updated_task.task_status,
+                'created_at': updated_task.created_at
             }
-        ).get('Item', None)
-        
-        if not existing_task:
-            print("Task not found!")
-            return None
-
-        # Create a new item with updated 'assigned_to'
-        new_task = existing_task.copy()
-        new_task.update({
-            'assigned_to': updated_task.assigned_to,
-            'title': updated_task.title,
-            'description': updated_task.description,
-            'deadline': updated_task.deadline,
-            'task_status': updated_task.task_status,
-            'created_at': updated_task.created_at
-        })
-
-        table.put_item(Item=new_task)
+        )
 
         # Delete the old item
         table.delete_item(
@@ -123,11 +110,22 @@ def update_task(task_id: str, current_assigned_to: str, updated_task: Task) -> O
                 'assigned_to': current_assigned_to
             }
         )
+        
+        return {
+            'task_id': task_id,
+            'assigned_to': updated_task.assigned_to,
+            'title': updated_task.title,
+            'description': updated_task.description,
+            'deadline': updated_task.deadline,
+            'task_status': updated_task.task_status,
+            'created_at': updated_task.created_at
+        }
 
-        return new_task  # Return the new task details
     except ClientError as e:
-        print(f"Error reassigning task: {e}")
+        print(f"Transaction failed: {e.response['Error']['Message']}")
         return None
+
+
 # Delete Task - Remove a task from the database
 def delete_task(task_id: str,assigned_to:str) -> Optional[dict]:
     try:

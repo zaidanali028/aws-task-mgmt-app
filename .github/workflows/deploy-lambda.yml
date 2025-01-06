@@ -1,0 +1,38 @@
+name: Deploy Lambda
+
+on:
+  push:
+    branches:
+      - main  # Trigger deployment only for pushes to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Configure AWS CLI
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # Step 3: Navigate to the Lambda folder
+    - name: Navigate to Lambda folder
+      working-directory: ./app
+
+    # Step 4: Zip the Lambda function code
+    - name: Zip Lambda function
+      run: zip -r ../function.zip . # Zip contents and save it one level above
+
+    # Step 5: Deploy to AWS Lambda
+    - name: Deploy to AWS Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-FastAPILambdaFunctionC1ADADAF-4g4FCpZ9xIL6 \
+          --zip-file fileb://function.zip

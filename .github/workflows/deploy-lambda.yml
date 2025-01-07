@@ -26,9 +26,42 @@ jobs:
     - name: Zip Lambda function
       run: zip -r function.zip app
 
-    # Step 4: Deploy to AWS Lambda
-    - name: Deploy to AWS Lambda
+    # Step 4: Deploy to FastAPI Lambda
+    - name: Deploy to FastAPI Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-FastAPILambdaFunctionC1ADADAF-A35BYbPR2gCp \
           --zip-file fileb://function.zip
+
+    # Step 5: Zip the 'task_created' Lambda function code
+    - name: Zip Task Created Lambda
+      run: zip -r task_created_fuwnction.zip listeners/task_created
+
+    # Step 6: Deploy to Task Created Lambda
+    - name: Deploy to Task Created Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-TaskCreatedListener15AE0FCC-mSbZnpQBroMd \
+          --zip-file fileb://task_created_function.zip
+
+    # Step 7: Zip the 'task_updated' Lambda function code
+    - name: Zip Task Updated Lambda
+      run: zip -r task_updated_function.zip listeners/task_updated
+
+    # Step 8: Deploy to Task Updated Lambda
+    - name: Deploy to Task Updated Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-TaskUpdatedListener15AE0FCC-mSbZnpQBroMd \
+          --zip-file fileb://task_updated_function.zip
+
+    # Step 9: Zip the 'user_created' Lambda function code
+    - name: Zip User Created Lambda
+      run: zip -r user_created_function.zip listeners/user_created
+
+    # Step 10: Deploy to User Created Lambda
+    - name: Deploy to User Created Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
+          --zip-file fileb://user_created_function.zip

@@ -53,6 +53,9 @@ async def update_task(task_id: str,updated_task: Task, token: str = Depends(oaut
         # Update task in DynamoDB
         task_response=task_model.update_task(task_id, updated_task)
         user_email=user_model.get_user(updated_task.assigned_to).get('attributes').get("email")
+        task=updated_task.dict()
+        del task['task_id']
+        print(updated_task)
         
         event_response=utils.publish_task_updated_event(updated_task.title,updated_task.dict(),user_email)
         

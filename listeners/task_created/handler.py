@@ -24,9 +24,7 @@ def handler(event, context):
             f"A new task has been assigned to you:\n\n"
             f"Title: {title}\n"
             f"Description: {description}\n"
-            f"Deadline: {deadline}\n"
-            f"Status: {task_status}\n"
-            f"Assigned To (ID): {assigned_to}\n\n"
+            f"Status: {task_status}\n\n"
             f"Please log in to the system to view more details.\n\n"
             f"#awsEventBridge"
         )

@@ -61,12 +61,17 @@ jobs:
         ls # List contents in the user_created folder to verify presence of handler.py
         zip ../../user_created_function.zip handler.py
 
-    # Step 9: Deploy to User Created Lambda
-    - name: Deploy to User Created Lambda
-      run: |
-        aws lambda update-function-code \
-          --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
-          --zip-file fileb://user_created_function.zip
+    # # Step 9: Deploy to User Created Lambda
+    # - name: Deploy to User Created Lambda
+    #   run: |
+    #     aws lambda update-function-code \
+    #       --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
+    #       --zip-file fileb://user_created_function.zip
+
+    # exeption for step 9 
+    # An error occurred (ResourceConflictException) when calling the UpdateFunctionCode operation: 
+      # The operation cannot be performed at this time. An update is in progress for resource: 
+      # arn:aws:lambda:***:774305574116:function:CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5
 
     # Step 10: Zip the Lambda function code, including the 'app' folder
     - name: Zip Lambda function

@@ -31,14 +31,14 @@ jobs:
       run: |
         cd listeners/task_created
         ls # List contents in the task_created folder to verify presence of handler.py
-        zip ../task_created_function.zip handler.py
+        zip ../../task_created_function.zip handler.py
 
     # Step 5: Deploy to Task Created Lambda
     - name: Deploy to Task Created Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-TaskCreatedListener15AE0FCC-mSbZnpQBroMd \
-          --zip-file fileb://listeners/task_created/task_created_function.zip
+          --zip-file fileb://task_created_function.zip
 
     # Step 6: Zip the 'task_updated' Lambda function handler.py
     - name: Zip Task Updated Lambda

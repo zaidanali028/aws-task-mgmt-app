@@ -37,8 +37,8 @@ jobs:
     - name: Deploy to Task Created Lambda
       run: |
         aws lambda update-function-code \
-          --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
-          --zip-file fileb://task_created_function.zip
+          --function-name CdkProjectStack-TaskCreatedListener15AE0FCC-mSbZnpQBroMd \
+          --zip-file fileb://listeners/task_created/task_created_function.zip
 
     # Step 6: Zip the 'task_updated' Lambda function handler.py
     - name: Zip Task Updated Lambda
@@ -52,7 +52,7 @@ jobs:
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-TaskUpdatedListener15AE0FCC-mSbZnpQBroMd \
-          --zip-file fileb://task_updated_function.zip
+          --zip-file fileb://listeners/task_updated/task_updated_function.zip
 
     # Step 8: Zip the 'user_created' Lambda function handler.py
     - name: Zip User Created Lambda
@@ -66,4 +66,15 @@ jobs:
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
-          --zip-file fileb://user_created_function.zip
+          --zip-file fileb://listeners/user_created/user_created_function.zip
+
+    # Step 10: Zip the Lambda function code, including the 'app' folder
+    - name: Zip Lambda function
+      run: zip -r function.zip app
+
+    # Step 11: Deploy to AWS Lambda
+    - name: Deploy to AWS Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-FastAPILambdaFunctionC1ADADAF-A35BYbPR2gCp \
+          --zip-file fileb://function.zip

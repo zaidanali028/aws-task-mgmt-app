@@ -72,7 +72,7 @@ jobs:
     - name: Zip Lambda function
       run: zip -r function.zip app
 
-    # Step 11: Deploy to AWS Lambda
+    # Step 11: Deploy to AWS Lambda.
     - name: Deploy to AWS Lambda
       run: |
         aws lambda update-function-code \

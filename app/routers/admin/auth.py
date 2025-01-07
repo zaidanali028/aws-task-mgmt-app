@@ -31,7 +31,7 @@ async def admin_login(credentials: AdminUserLogin):
         # Generate the secret hash
         secret_hash = utils.generate_secret_hash(
             my_env_vars.get("COGNITO_APP_CLIENT_ID"),
-            my_env_vars.get("COGNITO_APP_CLIENT_SECRET2"),
+            my_env_vars.get("COGNITO_APP_CLIENT_SECRET"),
             credentials.email
         )
 

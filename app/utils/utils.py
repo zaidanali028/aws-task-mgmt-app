@@ -167,7 +167,7 @@ def publish_user_created_event(email:str, given_name:str, family_name:str,user_p
                 'Source': 'app.taskmgmt',  # Event source identifier
                 'DetailType': 'UserCreated',         # Event type
                 'Detail': json.dumps(event_detail),  # Event data
-                'EventBusName': 'TaskMgmtEventBus'           # Event bus (use "default" for now)
+                'EventBusName': 'UserCreatedEventBus'           # Event bus (use "default" for now)
             }
         ]
     )
@@ -206,11 +206,11 @@ def publish_task_created_event(
                 "Source": "app.taskmgmt",  # Event source identifier
                 "DetailType": "TaskCreated",  # Event type
                 "Detail": json.dumps(event_detail),  # Event data
-                "EventBusName": "TaskMgmtEventBus",  # Event bus name
+                "EventBusName": "TaskCreatedEventBus",  # Event bus name
             }
         ]
     )
-    print(f"Task created event emitted: {response}")
+    print(f"Task created event emitted: {event_detail,response}")
     return response
 
 def publish_task_updated_event(
@@ -238,7 +238,7 @@ def publish_task_updated_event(
                 "Source": "app.taskmgmt",  # Event source identifier
                 "DetailType": "TaskUpdated",  # Event type
                 "Detail": json.dumps(event_detail),  # Event data
-                "EventBusName": "TaskMgmtEventBus",  # Event bus name
+                "EventBusName": "TaskUpdatedEventBus",  # Event bus name
             }
         ]
     )

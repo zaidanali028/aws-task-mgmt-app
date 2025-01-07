@@ -6,6 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 import uuid
 from typing import List
 from app.db import task as task_model
+from app.db import user as user_model
+
 import time
 my_env_vars=utils.load_env()
 
@@ -35,7 +37,8 @@ async def create_task(task: Task, token: str = Depends(oauth2_scheme)):
         
         # Insert task into DynamoDB
         task_response=task_model.create_task(task)
-        event_response=utils.publish_task_created_event(task.title,task.description,task.assigned_to,task.deadline,task.task_status,task.email)
+        user_email=user_model.get_user(task.assigned_to).get('attributes').get("email")
+        event_response=utils.publish_task_created_event(task.title,task.description,task.assigned_to,task.deadline,task.task_status,user_email)
         
         
         return {"task_id": task.task_id, "message": "Task created successfully.","task_data":task.dict()}
@@ -49,7 +52,9 @@ async def update_task(task_id: str,updated_task: Task, token: str = Depends(oaut
         utils.verify_token(token,"Admins")
         # Update task in DynamoDB
         task_response=task_model.update_task(task_id, updated_task)
-        event_response=utils.publish_task_updated_event(updated_task.title,updated_task.dict(),updated_task.email)
+        user_email=user_model.get_user(updated_task.assigned_to).get('attributes').get("email")
+        
+        event_response=utils.publish_task_updated_event(updated_task.title,updated_task.dict(),user_email)
         
         return {"task_id": task_id, "message": "Task updated successfully.","task_data":task_response}
         

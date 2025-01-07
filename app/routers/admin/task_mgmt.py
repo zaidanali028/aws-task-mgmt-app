@@ -57,7 +57,7 @@ async def update_task(task_id: str,updated_task: Task, token: str = Depends(oaut
         del task['task_id']
         print(updated_task)
         
-        event_response=utils.publish_task_updated_event(updated_task.title,updated_task.dict(),user_email)
+        event_response=utils.publish_task_updated_event(updated_task.title,task.dict(),user_email)
         
         return {"task_id": task_id, "message": "Task updated successfully.","task_data":task_response}
         

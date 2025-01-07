@@ -32,6 +32,7 @@ lambda_layer
 lambda_layer/
 # Test files
 test.json
+
 todo.txt
 
 # PyCharm and other IDE files
@@ -43,3 +44,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+
+# python dependencies
+python
+python/

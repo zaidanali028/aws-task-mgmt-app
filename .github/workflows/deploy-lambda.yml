@@ -22,50 +22,46 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # Step 3: Zip the FastAPI Lambda function code (only the handler.py file)
-    - name: Zip FastAPI Lambda
-      run: zip -r function.zip app  # Assuming main.py is the handler file
+    # Step 3: List contents to verify paths
+    - name: List files in the directory
+      run: ls -R
 
-    # Step 4: Deploy to FastAPI Lambda
-    - name: Deploy to FastAPI Lambda
-      run: |
-        aws lambda update-function-code \
-          --function-name CdkProjectStack-FastAPILambdaFunctionC1ADADAF-A35BYbPR2gCp \
-          --zip-file fileb://function.zip
-
-    # Step 5: Zip the 'task_created' Lambda function handler.py
+    # Step 4: Zip the 'task_created' Lambda function handler.py
     - name: Zip Task Created Lambda
       run: |
         cd listeners/task_created
+        ls # List contents in the task_created folder to verify presence of handler.py
         zip ../task_created_function.zip handler.py
 
-    # Step 6: Deploy to Task Created Lambda
+    # Step 5: Deploy to Task Created Lambda
     - name: Deploy to Task Created Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-TaskCreatedListener15AE0FCC-mSbZnpQBroMd \
           --zip-file fileb://listeners/task_created/task_created_function.zip
 
-    # Step 7: Zip the 'task_updated' Lambda function handler.py
+    # Step 6: Zip the 'task_updated' Lambda function handler.py
     - name: Zip Task Updated Lambda
       run: |
         cd listeners/task_updated
+        ls # List contents in the task_updated folder to verify presence of handler.py
         zip ../task_updated_function.zip handler.py
 
-    # Step 8: Deploy to Task Updated Lambda
+    # Step 7: Deploy to Task Updated Lambda
     - name: Deploy to Task Updated Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-TaskUpdatedListener15AE0FCC-mSbZnpQBroMd \
           --zip-file fileb://listeners/task_updated/task_updated_function.zip
 
-    # Step 9: Zip the 'user_created' Lambda function handler.py
+    # Step 8: Zip the 'user_created' Lambda function handler.py
     - name: Zip User Created Lambda
       run: |
         cd listeners/user_created
+        ls # List contents in the user_created folder to verify presence of handler.py
         zip ../user_created_function.zip handler.py
 
-    # Step 10: Deploy to User Created Lambda
+    # Step 9: Deploy to User Created Lambda
     - name: Deploy to User Created Lambda
       run: |
         aws lambda update-function-code \

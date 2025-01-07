@@ -173,3 +173,74 @@ def publish_user_created_event(email:str, given_name:str, family_name:str,user_p
     )
     print(f"Event emitted: {response}")
     return response
+
+
+def publish_task_created_event(
+    title: str, description: str, assigned_to: str, deadline: str, task_status: str, email: str
+):
+    """
+    Publish an event to EventBridge for task creation.
+
+    Args:
+        title (str): Title of the task.
+        description (str): Description of the task.
+        assigned_to (str): ID of the assignee.
+        deadline (str): Deadline of the task in ISO format.
+        task_status (str): Status of the task.
+        email (str): Email of the assignee or recipient for notification.
+    """
+    # Define event details
+    event_detail = {
+        "title": title,
+        "description": description,
+        "assigned_to": assigned_to,
+        "deadline": deadline,
+        "task_status": task_status,
+        "email": email,
+    }
+
+    # Publish the event to EventBridge
+    response = eventbridge.put_events(
+        Entries=[
+            {
+                "Source": "app.taskmgmt",  # Event source identifier
+                "DetailType": "TaskCreated",  # Event type
+                "Detail": json.dumps(event_detail),  # Event data
+                "EventBusName": "TaskMgmtEventBus",  # Event bus name
+            }
+        ]
+    )
+    print(f"Task created event emitted: {response}")
+    return response
+
+def publish_task_updated_event(
+    title: str, updated_fields: dict, email: str
+):
+    """
+    Publish an event to EventBridge for task updates.
+
+    Args:
+        title (str): Title of the task.
+        updated_fields (dict): A dictionary of updated fields and their new values.
+        email (str): Email of the recipient for notification.
+    """
+    # Define event details
+    event_detail = {
+        "title": title,
+        "updated_fields": updated_fields,
+        "email": email,
+    }
+
+    # Publish the event to EventBridge
+    response = eventbridge.put_events(
+        Entries=[
+            {
+                "Source": "app.taskmgmt",  # Event source identifier
+                "DetailType": "TaskUpdated",  # Event type
+                "Detail": json.dumps(event_detail),  # Event data
+                "EventBusName": "TaskMgmtEventBus",  # Event bus name
+            }
+        ]
+    )
+    print(f"Task updated event emitted: {response}")
+    return response

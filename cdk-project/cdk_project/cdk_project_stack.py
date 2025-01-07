@@ -1,11 +1,9 @@
-
-
 from aws_cdk import (
     aws_lambda as _lambda,
-    aws_iam, aws_lambda,
+    aws_iam,
     Stack,
-   aws_events_targets,
-   aws_events
+    aws_events_targets,
+    aws_events
 )
 from constructs import Construct
 from utils import load_env
@@ -15,7 +13,7 @@ class CdkProjectStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # 1. Lambda layer
+        # Lambda Layer
         self.layer = _lambda.LayerVersion(
             self,
             "TaskMgmtDependenciesLayer",
@@ -24,13 +22,7 @@ class CdkProjectStack(Stack):
             description="Shared dependencies for FastAPI and AWS SDK"
         )
 
-
-        # Existing Layer from Step 2
-        layer = self.layer
-        
-        
-        
-         # Reference the existing IAM role 3
+        # Existing IAM Role
         existing_role = aws_iam.Role.from_role_arn(
             self,
             "taskMgmtApp",
@@ -38,51 +30,89 @@ class CdkProjectStack(Stack):
             mutable=False
         )
 
-       
-
-        # EventBus 4
-        self.event_bus = aws_events.EventBus(
-            self, "TaskMgmtEventBus", event_bus_name="TaskMgmtEventBus"
+        # EventBuses
+        self.task_created_event_bus = aws_events.EventBus(
+            self, "TaskCreatedEventBus", event_bus_name="TaskCreatedEventBus"
         )
-        
-        # FastAPI Lambda function 5
-        # from app.utils import utils
-        # not working :(
-            
-
-        # not at the top to prevent circular import
-        project_environment=load_env()
-        self.fastapi_lambda = aws_lambda.Function(
-            self,
-            "FastAPILambdaFunction",
-            runtime=aws_lambda.Runtime.PYTHON_3_9,
-            handler="app.main.handler",
-            code=aws_lambda.Code.from_asset("../app/"),
-            layers=[layer],
-            role=existing_role,
-            environment=project_environment
+        self.task_updated_event_bus = aws_events.EventBus(
+            self, "TaskUpdatedEventBus", event_bus_name="TaskUpdatedEventBus"
         )
-        
-           # Listener Lambda function 6
-        listener_lambda = aws_lambda.Function(
+        self.user_created_event_bus = aws_events.EventBus(
+            self, "UserCreatedEventBus", event_bus_name="UserCreatedEventBus"
+        )
+
+        # Listener for User Created Event
+        user_created_listener = _lambda.Function(
             self,
-            "ListenerLambda",
-            runtime=aws_lambda.Runtime.PYTHON_3_9,
-            handler="handler.handler",
-            code=aws_lambda.Code.from_asset("../listener"),
+            "UserCreatedListener",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="user_created.handler",
+            code=_lambda.Code.from_asset("../listeners/user_created"),
             layers=[self.layer],
             role=existing_role,
         )
-        
-        
-          # Add rule to EventBus 7
         aws_events.Rule(
             self,
-            "TaskCreatedRule",
-            event_bus=self.event_bus,
+            "UserCreatedRule",
+            event_bus=self.user_created_event_bus,
             event_pattern={
                 "source": ["app.taskmgmt"],
                 "detail_type": ["UserCreated"],
             },
-            targets=[aws_events_targets.LambdaFunction(listener_lambda)],
+            targets=[aws_events_targets.LambdaFunction(user_created_listener)],
+        )
+
+        # Listener for Task Created Event
+        task_created_listener = _lambda.Function(
+            self,
+            "TaskCreatedListener",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="task_created.handler",
+            code=_lambda.Code.from_asset("../listeners/task_created"),
+            layers=[self.layer],
+            role=existing_role,
+        )
+        aws_events.Rule(
+            self,
+            "TaskCreatedRule",
+            event_bus=self.task_created_event_bus,
+            event_pattern={
+                "source": ["app.taskmgmt"],
+                "detail_type": ["TaskCreated"],
+            },
+            targets=[aws_events_targets.LambdaFunction(task_created_listener)],
+        )
+
+        # Listener for Task Updated Event
+        task_updated_listener = _lambda.Function(
+            self,
+            "TaskUpdatedListener",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="task_updated.handler",
+            code=_lambda.Code.from_asset("../listeners/task_updated"),
+            layers=[self.layer],
+            role=existing_role,
+        )
+        aws_events.Rule(
+            self,
+            "TaskUpdatedRule",
+            event_bus=self.task_updated_event_bus,
+            event_pattern={
+                "source": ["app.taskmgmt"],
+                "detail_type": ["TaskUpdated"],
+            },
+            targets=[aws_events_targets.LambdaFunction(task_updated_listener)],
+        )
+
+        # Main FastAPI Lambda Function
+        project_environment = load_env()
+        self.fastapi_lambda = _lambda.Function(
+            self,
+            "FastAPILambdaFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="app.main.handler",
+            code=_lambda.Code.from_asset("../app/"),
+            layers=[self.layer],
+            role=existing_role,
+            environment=project_environment
         )

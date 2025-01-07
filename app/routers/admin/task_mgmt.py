@@ -35,6 +35,8 @@ async def create_task(task: Task, token: str = Depends(oauth2_scheme)):
         
         # Insert task into DynamoDB
         task_response=task_model.create_task(task)
+        event_response=utils.publish_task_created_event(task.title,task.description,task.assigned_to,task.deadline,task.task_status,task.email)
+        
         
         return {"task_id": task.task_id, "message": "Task created successfully.","task_data":task.dict()}
     except Exception as e:
@@ -47,6 +49,8 @@ async def update_task(task_id: str,updated_task: Task, token: str = Depends(oaut
         utils.verify_token(token,"Admins")
         # Update task in DynamoDB
         task_response=task_model.update_task(task_id, updated_task)
+        event_response=utils.publish_task_updated_event(updated_task.title,updated_task.dict(),updated_task.email)
+        
         return {"task_id": task_id, "message": "Task updated successfully.","task_data":task_response}
         
     except Exception as e:

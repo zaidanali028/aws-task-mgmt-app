@@ -37,7 +37,7 @@ jobs:
     - name: Deploy to Task Created Lambda
       run: |
         aws lambda update-function-code \
-          --function-name CdkProjectStack-TaskCreatedListener15AE0FCC-mSbZnpQBroMd \
+          --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
           --zip-file fileb://task_created_function.zip
 
     # Step 6: Zip the 'task_updated' Lambda function handler.py
@@ -45,25 +45,25 @@ jobs:
       run: |
         cd listeners/task_updated
         ls # List contents in the task_updated folder to verify presence of handler.py
-        zip ../task_updated_function.zip handler.py
+        zip ../../task_updated_function.zip handler.py
 
     # Step 7: Deploy to Task Updated Lambda
     - name: Deploy to Task Updated Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-TaskUpdatedListener15AE0FCC-mSbZnpQBroMd \
-          --zip-file fileb://listeners/task_updated/task_updated_function.zip
+          --zip-file fileb://task_updated_function.zip
 
     # Step 8: Zip the 'user_created' Lambda function handler.py
     - name: Zip User Created Lambda
       run: |
         cd listeners/user_created
         ls # List contents in the user_created folder to verify presence of handler.py
-        zip ../user_created_function.zip handler.py
+        zip ../../user_created_function.zip handler.py
 
     # Step 9: Deploy to User Created Lambda
     - name: Deploy to User Created Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5 \
-          --zip-file fileb://listeners/user_created/user_created_function.zip
+          --zip-file fileb://user_created_function.zip

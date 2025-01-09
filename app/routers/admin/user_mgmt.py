@@ -19,6 +19,7 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
     decoded_token=utils.verify_token(token, "Admins")
     
     cognito_client = boto3.client('cognito-idp', region_name=my_env_vars.get("MY_AWS_REGION"))
+    ses_client = boto3.client('ses', region_name=my_env_vars.get("MY_AWS_REGION"))
     
 
     try:
@@ -70,7 +71,13 @@ async def create_team_member(team_member: TeamMember, token: str = Depends(oauth
         # emit event using event bridge
         event_response=utils.publish_user_created_event(team_member.email,team_member.given_name,team_member.family_name,user_password)
 
-        return {"message": "Team member created successfully!","response":response,"event_response":event_response}
+        
+        # Send email verification request through SES
+        ses_response = ses_client.verify_email_identity(
+            EmailAddress=team_member.email
+        )
+
+        return {"message": "Team member created successfully!","response":response,"event_response":event_response,"verification_email_response":ses_response},
     
     except cognito_client.exceptions.UsernameExistsException:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists.")

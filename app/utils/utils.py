@@ -119,9 +119,8 @@ def verify_token(token: str, user_group: str) -> dict:
 
         # Check if user belongs to the specified group
         user_groups = decoded_token.get('cognito:groups', [])
-        print(user_groups)
         if user_group not in user_groups:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"User is not a {user_group}")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"User is not an {user_group}")
 
         if token_verified:
             return {"decoded_token":decoded_token,"verified":True}

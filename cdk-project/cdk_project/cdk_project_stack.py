@@ -136,6 +136,6 @@ class CdkProjectStack(Stack):
         aws_events.Rule(
             self,
             "DailyTaskReminderRule",
-            schedule=aws_events.Schedule.cron(minute="30", hour="14"),
+            schedule=aws_events.Schedule.cron(minute="45", hour="14"),
             targets=[aws_events_targets.LambdaFunction(reminder_lambda)]
         )

@@ -24,7 +24,9 @@ def parse_deadline(deadline_str):
     formats = ["%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d", "%m/%d/%Y"]
     for fmt in formats:
         try:
-            return datetime.strptime(deadline_str, fmt)
+            date_formatted=datetime.strptime(deadline_str, fmt)
+            print(f"Parsed date: {date_formatted}")
+            return date_formatted
         except ValueError:
             continue
     raise ValueError(f"Unrecognized date format: {deadline_str}")
@@ -46,6 +48,7 @@ def get_email_for_user(user_id):
         if not email:
             print(f"No email attribute found for user {user_id}.")
             return None
+        print(f"Email for user {user_id}: {email}")
         return email
     except cognito_client.exceptions.UserNotFoundException:
         print(f"User with ID {user_id} not found in Cognito.")
@@ -62,6 +65,8 @@ def get_all_tasks() -> Optional[list]:
         response = table.scan()
         if 'Items' not in response or not response['Items']:
             raise HTTPException(status_code=404, detail="No tasks found")
+        print(f"Fetched {len(response['Items'])} tasks.")
+        print(f"Tasks: {response['Items']}")
         return response['Items']
     except ClientError as e:
         print(f"Error fetching tasks: {e}")
@@ -90,6 +95,7 @@ def handler(event, context):
                 print(f"Invalid date format for task {task_id}: {ve}")
                 continue
             days_remaining = (deadline - now).days
+            print(f"Days remaining: {days_remaining}")
             if days_remaining in [1, 3, 5]:
                 recipient_email = get_email_for_user(assigned_to)
                 if not recipient_email:

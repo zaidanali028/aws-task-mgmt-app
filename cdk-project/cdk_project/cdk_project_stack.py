@@ -18,7 +18,7 @@ class CdkProjectStack(Stack):
             self,
             "TaskMgmtDependenciesLayer",
             code=_lambda.Code.from_asset("../lambda_layer/lambda_layer.zip"),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_12],
             description="Shared dependencies for FastAPI and AWS SDK"
         )
 
@@ -45,7 +45,7 @@ class CdkProjectStack(Stack):
         user_created_listener = _lambda.Function(
             self,
             "UserCreatedListener",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             handler="handler.handler",
             code=_lambda.Code.from_asset("../listeners/user_created"),
             layers=[self.layer],
@@ -66,7 +66,7 @@ class CdkProjectStack(Stack):
         task_created_listener = _lambda.Function(
             self,
             "TaskCreatedListener",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             handler="handler.handler",
             code=_lambda.Code.from_asset("../listeners/task_created"),
             layers=[self.layer],
@@ -87,7 +87,7 @@ class CdkProjectStack(Stack):
         task_updated_listener = _lambda.Function(
             self,
             "TaskUpdatedListener",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             handler="handler.handler",
             code=_lambda.Code.from_asset("../listeners/task_updated"),
             layers=[self.layer],
@@ -109,10 +109,33 @@ class CdkProjectStack(Stack):
         self.fastapi_lambda = _lambda.Function(
             self,
             "FastAPILambdaFunction",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_12,
             handler="app.main.handler",
             code=_lambda.Code.from_asset("../app/"),
             layers=[self.layer],
             role=existing_role,
             environment=project_environment
+        )
+
+
+# UPDATED: Added EventBridge Rules for Task Reminders
+
+        # Reminder Lambda Function for Task Deadlines
+        reminder_lambda = _lambda.Function(
+            self,
+            "TaskReminderLambda",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="handler.handler",
+            code=_lambda.Code.from_asset("../listeners/task_due"),
+            layers=[self.layer],
+            role=existing_role,
+            environment=project_environment
+        )
+
+        # EventBridge Rule to schedule the Reminder Lambda daily at 8 AM UTC
+        aws_events.Rule(
+            self,
+            "DailyTaskReminderRule",
+            schedule=aws_events.Schedule.cron(minute="37", hour="13"),
+            targets=[aws_events_targets.LambdaFunction(reminder_lambda)]
         )

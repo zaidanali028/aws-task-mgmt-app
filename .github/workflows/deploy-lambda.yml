@@ -1,5 +1,3 @@
-name: Deploy Lambda
-
 on:
   push:
     branches:
@@ -70,16 +68,30 @@ jobs:
 
     # exeption for step 9 
     # An error occurred (ResourceConflictException) when calling the UpdateFunctionCode operation: 
-      # The operation cannot be performed at this time. An update is in progress for resource: 
-      # arn:aws:lambda:***:774305574116:function:CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5
+    # The operation cannot be performed at this time. An update is in progress for resource: 
+    # arn:aws:lambda:***:774305574116:function:CdkProjectStack-UserCreatedListener1045019B-BIW3g59OOHa5
 
     # Step 10: Zip the Lambda function code, including the 'app' folder
     - name: Zip Lambda function
       run: zip -r function.zip app
 
-    # Step 11: Deploy to AWS Lambda.
+    # Step 11: Deploy to AWS Lambda
     - name: Deploy to AWS Lambda
       run: |
         aws lambda update-function-code \
           --function-name CdkProjectStack-FastAPILambdaFunctionC1ADADAF-A35BYbPR2gCp \
           --zip-file fileb://function.zip
+
+    # Step 12: Zip the Task Reminder Lambda function handler.py
+    - name: Zip Task Reminder Lambda
+      run: |
+        cd listeners/task_due
+        ls # List contents in the task_due folder to verify presence of handler.py
+        zip ../../task_due_function.zip handler.py
+
+    # Step 13: Deploy to Task Reminder Lambda
+    - name: Deploy to Task Reminder Lambda
+      run: |
+        aws lambda update-function-code \
+          --function-name CdkProjectStack-TaskReminderLambda04272CB9-Te3tms6nC2hX \
+          --zip-file fileb://task_due_function.zip

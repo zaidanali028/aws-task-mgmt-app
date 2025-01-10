@@ -121,6 +121,8 @@ async def get_user_by_username(user_name: str, token: str = Depends(oauth2_schem
         family_name = next(
             (attr['Value'] for attr in response.get('UserAttributes', []) if attr['Name'] == 'family_name'), "N/A"
         )
+        
+        print(response.get('UserAttributes', []))
 
         return {"username": user_name, "name": f"{given_name} {family_name}"}
 

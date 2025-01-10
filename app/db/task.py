@@ -135,7 +135,7 @@ def delete_task(task_id: str,assigned_to:str) -> Optional[dict]:
         response = table.delete_item(
             Key={
                 'task_id': task_id,
-                'assigned_to': assigned_to
+                # 'assigned_to': assigned_to
             },
             ReturnValues="ALL_OLD"
             # The response will include the task attributes before it was deleted.

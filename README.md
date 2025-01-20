@@ -398,9 +398,7 @@ For support, please contact [your contact information]
 
 - This project is licensed under the MIT License - see the [MIT](LICENSE) file for details. 
 
-## Contributing
 
-Contributions are welcome. Please submit pull requests or open issues on the repository. 
 
 ---
 

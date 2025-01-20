@@ -365,7 +365,6 @@ Error: ProvisionedThroughputExceededException
 Solution: Implement exponential backoff retry
 ```
 
-[Additional troubleshooting scenarios...]
 
 ## Contributing Guidelines
 

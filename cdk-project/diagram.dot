@@ -1,0 +1,250 @@
+digraph "Diagram" {
+  splines = "ortho";
+  pad = "1.0";
+  nodesep = "0.60";
+  ranksep = "0.75";
+  fontname = "Sans-Serif";
+  fontsize = "15";
+  dpi = "200";
+  rankdir = "BT";
+  compound = "true";
+  fontcolor = "#222222";
+  edge [
+    color = "#D5871488",
+    penwidth = 2,
+    arrowhead = "dot",
+    arrowtail = "dot",
+  ];
+  node [
+    shape = "box",
+    style = "rounded",
+    fixedsize = true,
+    width = 1.7,
+    height = 1.7,
+    labelloc = "c",
+    imagescale = true,
+    fontname = "Sans-Serif",
+    fontsize = 8,
+    margin = 8,
+  ];
+  subgraph "CdkProjectStack" {
+    subgraph "cluster-SubGraph.CdkProjectStack" {
+      graph [
+        label = "CdkProjectStack",
+        labelloc = "b",
+        labeljust = "l",
+        margin = "10",
+        fontsize = "16",
+        penwidth = "2",
+        pencolor = "#888888",
+        style = "filled,rounded",
+        fillcolor = "#e4e4e4",
+      ];
+      "CdkProjectStack/TaskMgmtDependenciesLayer" [
+        label = "\nTaskMgmtDependenciesL",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.4819999999999998,
+      ];
+      "CdkProjectStack/TaskCreatedEventBus" [
+        label = " TaskCreatedEventBus",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/TaskUpdatedEventBus" [
+        label = " TaskUpdatedEventBus",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/UserCreatedEventBus" [
+        label = " UserCreatedEventBus",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/UserCreatedListener" [
+        label = " UserCreatedListener",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.266,
+      ];
+      "CdkProjectStack/UserCreatedRule" [
+        label = " UserCreatedRule",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/TaskCreatedListener" [
+        label = " TaskCreatedListener",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.266,
+      ];
+      "CdkProjectStack/TaskCreatedRule" [
+        label = " TaskCreatedRule",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/TaskUpdatedListener" [
+        label = " TaskUpdatedListener",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.266,
+      ];
+      "CdkProjectStack/TaskUpdatedRule" [
+        label = " TaskUpdatedRule",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.466,
+      ];
+      "CdkProjectStack/FastAPILambdaFunction" [
+        label = "\nFastAPILambdaFunction",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.4819999999999998,
+      ];
+      "CdkProjectStack/TaskReminderLambda" [
+        label = " TaskReminderLambda",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_Compute/64/Arch_AWS-Lambda_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 2,
+        height = 2.266,
+      ];
+      "CdkProjectStack/DailyTaskReminderRule" [
+        label = "\nDailyTaskReminderRule",
+        fontsize = 12,
+        image = "/usr/local/lib/node_modules/cdk-dia/icons/aws/Service/Arch_App-Integration/Arch_64/Arch_Amazon-EventBridge_64@5x.png",
+        imagescale = "true",
+        imagepos = "tc",
+        penwidth = "0",
+        shape = "node",
+        fixedsize = "true",
+        labelloc = "b",
+        width = 1.2,
+        height = 1.682,
+      ];
+    }
+  }
+  "CdkProjectStack/UserCreatedListener" -> "CdkProjectStack/TaskMgmtDependenciesLayer" [
+    dir = "both",
+  ];
+  "CdkProjectStack/UserCreatedRule" -> "CdkProjectStack/UserCreatedEventBus" [
+    dir = "both",
+  ];
+  "CdkProjectStack/UserCreatedRule" -> "CdkProjectStack/UserCreatedListener" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskCreatedListener" -> "CdkProjectStack/TaskMgmtDependenciesLayer" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskCreatedRule" -> "CdkProjectStack/TaskCreatedEventBus" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskCreatedRule" -> "CdkProjectStack/TaskCreatedListener" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskUpdatedListener" -> "CdkProjectStack/TaskMgmtDependenciesLayer" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskUpdatedRule" -> "CdkProjectStack/TaskUpdatedEventBus" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskUpdatedRule" -> "CdkProjectStack/TaskUpdatedListener" [
+    dir = "both",
+  ];
+  "CdkProjectStack/FastAPILambdaFunction" -> "CdkProjectStack/TaskMgmtDependenciesLayer" [
+    dir = "both",
+  ];
+  "CdkProjectStack/TaskReminderLambda" -> "CdkProjectStack/TaskMgmtDependenciesLayer" [
+    dir = "both",
+  ];
+  "CdkProjectStack/DailyTaskReminderRule" -> "CdkProjectStack/TaskReminderLambda" [
+    dir = "both",
+  ];
+}

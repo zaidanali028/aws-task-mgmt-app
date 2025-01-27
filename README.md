@@ -306,11 +306,7 @@ Attributes:
 
 
 
-#### DynamoDB Errors
-```
-Error: ProvisionedThroughputExceededException
-Solution: Implement exponential backoff retry
-```
+
 
 
 ## License

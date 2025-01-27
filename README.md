@@ -12,14 +12,13 @@ A comprehensive, enterprise-grade task management system built with FastAPI and 
 - [Development Guide](#development-guide)
 - [AWS Infrastructure](#aws-infrastructure)
 - [Security Implementation](#security-implementation)
-- [Testing Strategy](#testing-strategy)
 - [Monitoring and Logging](#monitoring-and-logging)
 - [Troubleshooting Guide](#troubleshooting-guide)
 - [Contributing Guidelines](#contributing-guidelines)
 - [License](#license)
 
 ## Architecture Overview
-
+![CDK STACK DIAGRAM](diagram-01.png)
 ### System Architecture
 The application implements a serverless microservices architecture leveraging various AWS services:
 
@@ -33,16 +32,15 @@ The application implements a serverless microservices architecture leveraging va
 
 ### Data Flow
 1. Client requests authenticated through Cognito
-2. API Gateway routes requests to Lambda functions
-3. Lambda executes FastAPI application code
-4. DynamoDB handles data persistence
-5. EventBridge manages async events
-6. SES handles email notifications
+2. Lambda executes FastAPI application code
+3. DynamoDB handles data persistence
+4. EventBridge manages async events
+5. SES handles email notifications
 
 ## Technical Stack
 
 ### Backend Framework
-- FastAPI 0.68.0+
+- FastAPI
 - Pydantic for data validation
 - Mangum for AWS Lambda integration
 
@@ -53,7 +51,6 @@ The application implements a serverless microservices architecture leveraging va
 - Amazon EventBridge: Event management
 - Amazon SES: Email services
 - AWS CDK: Infrastructure as code
-- API Gateway: REST API management
 
 ### Development Tools
 - Python 3.9+
@@ -61,7 +58,6 @@ The application implements a serverless microservices architecture leveraging va
 - boto3 for AWS SDK
 - pytest for testing
 - black for code formatting
-- flake8 for linting
 
 ## Features Deep Dive
 
@@ -87,7 +83,6 @@ async def admin_login(credentials: AdminUserLogin):
 - Separate authentication flow
 - Group-based permissions
 - Password reset functionality
-- MFA support (optional)
 
 ### Task Management
 #### Task Creation
@@ -116,7 +111,6 @@ async def create_task(task: Task, token: str = Depends(oauth2_scheme)):
 - Automatic password generation
 - Email verification
 - Group assignment
-- Welcome email sending
 
 #### User Updates
 - Profile management
@@ -186,7 +180,8 @@ Response:
 }
 ```
 
-[Detailed API documentation continued for all routes...]
+[others can be found at the 
+<root_of_where_this_project_will_be_hosted>/docs...]
 
 ## Setup and Installation
 
@@ -214,18 +209,15 @@ pip install -r requirements-dev.txt  # Development dependencies
 
 3. **Configure Environment Variables**
 ```bash
-cat > .env << EOL
+Creare .env file with the following variables:
+
+
 MY_AWS_REGION=us-east-1
 COGNITO_USER_POOL_ID=<your-user-pool-id>
 COGNITO_APP_CLIENT_ID=<your-app-client-id>
 COGNITO_APP_CLIENT_SECRET=<your-app-client-secret>
 DYNAMODB_TABLE_NAME=<your-table-name>
-EOL
-```
 
-4. **Initialize Database Tables**
-```bash
-python scripts/init_dynamodb.py
 ```
 
 ### AWS Infrastructure Deployment
@@ -255,32 +247,12 @@ After deployment, update your `.env` file with the output values from CDK deploy
 - Document functions and classes
 - Use meaningful variable names
 
-### Adding New Features
-1. Create feature branch
-2. Implement changes
-3. Add tests
-4. Update documentation
-5. Create pull request
-
-### Testing
-```bash
-# Run unit tests
-pytest tests/unit
-
-# Run integration tests
-pytest tests/integration
-
-# Run with coverage
-pytest --cov=app tests/
-```
-
 ## AWS Infrastructure
 
 ### DynamoDB Schema
 #### Tasks Table
 ```
 Primary Key: task_id (String)
-Sort Key: assigned_to (String)
 Attributes:
 - title (String)
 - description (String)
@@ -289,12 +261,7 @@ Attributes:
 - created_at (String)
 ```
 
-#### Indexes
-```
-GSI1:
-- PK: assigned_to
-- SK: created_at
-```
+
 
 ### Cognito Setup
 - User Pool with email authentication
@@ -306,7 +273,6 @@ GSI1:
 - Memory: 256 MB
 - Timeout: 30 seconds
 - Runtime: Python 3.9
-- VPC configuration (optional)
 - Custom layers for dependencies
 
 ## Security Implementation
@@ -324,7 +290,6 @@ GSI1:
 - API Gateway authorization
 
 ### Data Security
-- Encryption at rest
 - Encryption in transit
 - Secure password handling
 - Input validation
@@ -332,32 +297,14 @@ GSI1:
 ## Monitoring and Logging
 
 ### CloudWatch Integration
-- API Gateway access logs
-- Lambda function logs
-- Custom metrics
-- Alarms configuration
+- Lambda function logs(Cloudwatch log groups)
 
-### Application Logging
-```python
-import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Example usage
-logger.info("Task created: %s", task_id)
-logger.error("Error processing request: %s", str(e))
-```
 
 ## Troubleshooting Guide
 
-### Common Issues
 
-#### Authentication Failures
-```
-Error: NotAuthorizedException
-Solution: Verify credentials and token expiration
-```
+
 
 #### DynamoDB Errors
 ```
@@ -366,25 +313,9 @@ Solution: Implement exponential backoff retry
 ```
 
 
-## Contributing Guidelines
-
-### Pull Request Process
-1. Fork the repository
-2. Create feature branch
-3. Implement changes
-4. Add tests
-5. Update documentation
-6. Submit PR
-
-### Code Review Process
-- Two approvals required
-- CI checks must pass
-- Documentation updated
-- Tests included
-
 ## License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [MIT](LICENSE) file for details.
 
 ---
 
@@ -392,13 +323,7 @@ Solution: Implement exponential backoff retry
 
 For support, please contact [your contact information]
 
-
-##  License
-
-- This project is licensed under the MIT License - see the [MIT](LICENSE) file for details. 
-
-
-
 ---
 
-*Last updated: January 2024*
+*Last updated: January 2025*
+

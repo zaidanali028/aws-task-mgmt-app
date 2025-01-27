@@ -317,7 +317,7 @@ This project is licensed under the MIT License - see the [MIT](LICENSE) file for
 
 ## Support and Contact
 
-For support, please contact [your contact information]
+For support, please contact zaidanali028@gmail.com
 
 ---
 

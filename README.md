@@ -56,7 +56,7 @@ The application implements a serverless microservices architecture leveraging va
 - Python 3.9+
 - AWS CDK v2
 - boto3 for AWS SDK
-- pytest for testing
+
 - black for code formatting
 
 ## Features Deep Dive
@@ -147,7 +147,7 @@ Detailed breakdown of the project structure:
 ├── lambda_layer/            # Lambda layer dependencies
 ├── tests/
 │   ├── unit/               # Unit tests
-│   └── integration/        # Integration tests
+│  
 └── requirements.txt        # Project dependencies
 ```
 

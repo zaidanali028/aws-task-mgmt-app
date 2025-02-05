@@ -1,23 +1,17 @@
 from aws_cdk import (
-    Stack,
     aws_lambda as _lambda,
-    aws_events as aws_events,
-    aws_events_targets as aws_events_targets,
-    aws_iam as aws_iam,
-    aws_dynamodb as aws_dynamodb,
-    aws_cognito as aws_cognito,
-    aws_ses as aws_ses,
+    aws_iam,
+    Stack,
+    aws_events_targets,
+    aws_events
 )
 from constructs import Construct
 from utils import load_env
 
-
 class CdkProjectStack(Stack):
+
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
-        # Load environment variables
-        project_environment = load_env()
 
         # Lambda Layer
         self.layer = _lambda.LayerVersion(
@@ -25,7 +19,7 @@ class CdkProjectStack(Stack):
             "TaskMgmtDependenciesLayer",
             code=_lambda.Code.from_asset("../lambda_layer/lambda_layer.zip"),
             compatible_runtimes=[_lambda.Runtime.PYTHON_3_12],
-            description="Shared dependencies for FastAPI and AWS SDK",
+            description="Shared dependencies for FastAPI and AWS SDK"
         )
 
         # Existing IAM Role
@@ -33,35 +27,7 @@ class CdkProjectStack(Stack):
             self,
             "taskMgmtApp",
             "arn:aws:iam::774305574116:role/taskMgmtApp",
-            mutable=False,
-        )
-
-     
-
-     
-
-        # Main FastAPI Lambda Function
-        self.fastapi_lambda = _lambda.Function(
-            self,
-            "FastAPILambdaFunction",
-            runtime=_lambda.Runtime.PYTHON_3_12,
-            handler="app.main.handler",
-            code=_lambda.Code.from_asset("../app/"),
-            layers=[self.layer],
-            role=existing_role,
-            environment={
-                **project_environment,
-                "USER_POOL_ID": self.user_pool.user_pool_id,
-                "TASK_TABLE_NAME": self.task_table.table_name,
-            },
-        )
-
-        # Grant permissions to FastAPI Lambda
-        self.task_table.grant_read_write_data(self.fastapi_lambda)
-        self.user_pool.grant(
-            self.fastapi_lambda,
-            "cognito-idp:AdminCreateUser",
-            "cognito-idp:AdminSetUserPassword",
+            mutable=False
         )
 
         # EventBuses
@@ -84,7 +50,6 @@ class CdkProjectStack(Stack):
             code=_lambda.Code.from_asset("../listeners/user_created"),
             layers=[self.layer],
             role=existing_role,
-           
         )
         aws_events.Rule(
             self,
@@ -106,7 +71,6 @@ class CdkProjectStack(Stack):
             code=_lambda.Code.from_asset("../listeners/task_created"),
             layers=[self.layer],
             role=existing_role,
-         
         )
         aws_events.Rule(
             self,
@@ -140,6 +104,22 @@ class CdkProjectStack(Stack):
             targets=[aws_events_targets.LambdaFunction(task_updated_listener)],
         )
 
+        # Main FastAPI Lambda Function
+        project_environment = load_env()
+        self.fastapi_lambda = _lambda.Function(
+            self,
+            "FastAPILambdaFunction",
+            runtime=_lambda.Runtime.PYTHON_3_12,
+            handler="app.main.handler",
+            code=_lambda.Code.from_asset("../app/"),
+            layers=[self.layer],
+            role=existing_role,
+            environment=project_environment
+        )
+
+
+# UPDATED: Added EventBridge Rules for Task Reminders
+
         # Reminder Lambda Function for Task Deadlines
         reminder_lambda = _lambda.Function(
             self,
@@ -149,7 +129,7 @@ class CdkProjectStack(Stack):
             code=_lambda.Code.from_asset("../listeners/task_due"),
             layers=[self.layer],
             role=existing_role,
-           
+            environment=project_environment
         )
 
         # EventBridge Rule to schedule the Reminder Lambda daily at 8 AM UTC
@@ -157,8 +137,9 @@ class CdkProjectStack(Stack):
             self,
             "DailyTaskReminderRule",
             schedule=aws_events.Schedule.cron(minute="0", hour="8"),
-            targets=[aws_events_targets.LambdaFunction(reminder_lambda)],
+            targets=[aws_events_targets.LambdaFunction(reminder_lambda)]
         )
+
         
         
            # DynamoDB Table for Tasks
